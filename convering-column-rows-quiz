@@ -1,0 +1,57 @@
+Sub ProcessRawDataToSheet2()
+    Dim wsSource As Worksheet
+    Dim wsTarget As Worksheet
+    Dim rawData As Range
+    Dim outputRow As Integer
+    Dim i As Integer
+    Dim question As String
+    Dim options(1 To 5) As String ' Array for 5 options (A-E)
+    Dim correctAnswer As String
+
+    ' Set the source worksheet (where raw data is located)
+    Set wsSource = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your source sheet name
+
+    ' Set the target worksheet (where processed data will be written)
+    Set wsTarget = ThisWorkbook.Sheets("Sheet2") ' Change "Sheet2" to your target sheet name
+
+    ' Define the range containing the raw data
+    Set rawData = wsSource.Range("A1:A100") ' Adjust the range as needed
+
+    ' Define the starting row for the output in Sheet2
+    outputRow = 1 ' Change this to the desired starting row in Sheet2
+
+    ' Loop through the raw data
+    For i = 1 To rawData.Rows.Count
+        ' Check if the cell contains a question
+        If InStr(rawData.Cells(i, 1).Value, "?") > 0 Then
+            ' Extract the question
+            question = rawData.Cells(i, 1).Value
+
+            ' Extract the options (A-E)
+            options(1) = rawData.Cells(i + 1, 1).Value ' Option A
+            options(2) = rawData.Cells(i + 2, 1).Value ' Option B
+            options(3) = rawData.Cells(i + 3, 1).Value ' Option C
+            options(4) = rawData.Cells(i + 4, 1).Value ' Option D
+            options(5) = rawData.Cells(i + 5, 1).Value ' Option E
+
+            ' Extract the correct answer
+            correctAnswer = rawData.Cells(i + 6, 1).Value
+            correctAnswer = Mid(correctAnswer, InStr(correctAnswer, ":") + 2) ' Extract the answer after the colon
+
+            ' Write the data to Sheet2
+            wsTarget.Cells(outputRow, 1).Value = question ' Column 1: Question
+            wsTarget.Cells(outputRow, 2).Value = options(1) ' Column 2: Option A
+            wsTarget.Cells(outputRow, 3).Value = options(2) ' Column 3: Option B
+            wsTarget.Cells(outputRow, 4).Value = options(3) ' Column 4: Option C
+            wsTarget.Cells(outputRow, 5).Value = options(4) ' Column 5: Option D
+            wsTarget.Cells(outputRow, 6).Value = options(5) ' Column 6: Option E
+            wsTarget.Cells(outputRow, 7).Value = correctAnswer ' Column 7: Correct Answer
+
+            ' Move to the next output row
+            outputRow = outputRow + 1
+        End If
+    Next i
+
+    ' Notify the user
+    MsgBox "Raw data processed successfully and written to Sheet2!", vbInformation
+End Sub
