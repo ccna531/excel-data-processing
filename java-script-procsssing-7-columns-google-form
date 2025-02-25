@@ -1,0 +1,77 @@
+function createGoogleForm() {
+  try {
+    // Access the active spreadsheet and sheet
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = sheet.getDataRange().getValues();
+
+    // Check if the sheet has data
+    if (data.length <= 1) {
+      throw new Error("No data found in the sheet. Please ensure the sheet has at least one question and options.");
+    }
+
+    // Create a new Google Form
+    var form = FormApp.create('TCP/IP Transport Layer Quiz');
+    form.setDescription('This quiz is automatically generated from Google Sheets data.');
+    form.setIsQuiz(true); // Enable quiz mode
+
+    // Loop through the data (skip the header row)
+    for (var i = 1; i < data.length; i++) {
+      var question = data[i][0]; // Get the question text
+      var options = [];
+      var correctAnswer = data[i][6]; // Correct Answer is in the 7th column (index 6)
+
+      // Log intermediate values for debugging
+      Logger.log(`Processing row ${i + 1}:`);
+      Logger.log(`Question: ${question}`);
+      Logger.log(`Correct Answer: ${correctAnswer}`);
+
+      // Extract options dynamically (columns 2 to 6)
+      for (var j = 1; j <= 6; j++) {
+        var option = String(data[i][j]).trim(); // Convert to string and trim whitespace
+        if (option !== "") {
+          options.push(option); // Add non-empty options
+        }
+      }
+
+      Logger.log(`Options: ${options}`);
+
+      // Add the question to the form if it's valid
+      if (question.trim() !== "" && options.length > 0) {
+        var item = form.addMultipleChoiceItem();
+        item.setTitle(question);
+
+        // Create choices and mark the correct answer
+        var choices = options.map((opt, index) => {
+          if (opt === correctAnswer) {
+            return item.createChoice(opt, true); // Mark the correct answer
+          } else {
+            return item.createChoice(opt); // Regular choice
+          }
+        });
+
+        item.setChoices(choices); // Set the choices for the question
+
+        // Assign points for the correct answer
+        item.setPoints(1);
+
+        // Create feedback for the correct answer
+        var feedback = FormApp.createFeedback()
+          .setText(`Correct! ${correctAnswer} is the right answer.`)
+          .build();
+        item.setFeedbackForCorrect(feedback); // Set feedback for correct answer
+
+        Logger.log(`Correct answer set for row ${i + 1}: ${correctAnswer}`);
+      } else {
+        Logger.log(`Skipping row ${i + 1}: Question or options are empty.`);
+      }
+    }
+
+    // Log the form URL
+    var formUrl = form.getPublishedUrl();
+    Logger.log("Form created successfully! Form URL: " + formUrl);
+    SpreadsheetApp.getUi().alert("Form created successfully! Form URL: " + formUrl); // Show alert to the user
+  } catch (error) {
+    Logger.log("Error: " + error.message);
+    SpreadsheetApp.getUi().alert("Error: " + error.message); // Show error alert to the user
+  }
+}
