@@ -55,7 +55,3 @@ Sub ProcessRawDataToSheet2()
     ' Notify the user
     MsgBox "Raw data processed successfully and written to Sheet2!", vbInformation
 End Sub
-
-    ' Notify the user
-    MsgBox "Raw data processed successfully and written to Sheet2!", vbInformation
-End Sub
