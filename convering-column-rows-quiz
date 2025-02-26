@@ -51,7 +51,3 @@ Sub ProcessRawDataToSheet2()
             outputRow = outputRow + 1
         End If
     Next i
-
-    ' Notify the user
-    MsgBox "Raw data processed successfully and written to Sheet2!", vbInformation
-End Sub
